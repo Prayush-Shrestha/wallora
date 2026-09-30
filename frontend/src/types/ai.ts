@@ -12,6 +12,13 @@ export interface AIWallpaper {
   dimensions?: { width: number; height: number };
   imageUrl: string;
   provider?: string;
+  model?: string;
+  generationId?: string;
+  assetType?: string;
+  licenseType?: string;
+  licenseTerms?: string;
+  copyrightNotice?: string;
+  referenceType?: "NONE" | "USER_UPLOADED";
   createdAt: string;
 }
 
@@ -23,4 +30,7 @@ export interface GenerateAIRequest {
   resolution?: "standard" | "4k";
   negativePrompt?: string;
   provider?: "auto" | "replicate" | "openai" | "flux-free";
+  referenceImageUrl?: string;
+  referenceType?: "NONE" | "USER_UPLOADED";
+  userRightsConfirmed?: boolean;
 }

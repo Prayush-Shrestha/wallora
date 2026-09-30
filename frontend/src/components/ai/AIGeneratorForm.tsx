@@ -84,7 +84,7 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-line/10 bg-raised/80 backdrop-blur-xl p-6 sm:p-8 space-y-6">
-      {/* Prompt Input */}
+    
       <div>
         <div className="flex items-center justify-between mb-2">
           <label htmlFor="ai-prompt" className="text-xs font-semibold text-muted uppercase tracking-wider flex items-center gap-1.5">

@@ -4,7 +4,18 @@ import { AuthRequest } from "../types";
 
 export async function generateAIWallpaper(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { prompt, style, category, orientation, resolution, negativePrompt, provider } = req.body;
+    const {
+      prompt,
+      style,
+      category,
+      orientation,
+      resolution,
+      negativePrompt,
+      provider,
+      referenceImageUrl,
+      referenceType,
+      userRightsConfirmed,
+    } = req.body;
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       res.status(400).json({ success: false, error: "A descriptive prompt is required." });
@@ -19,6 +30,9 @@ export async function generateAIWallpaper(req: AuthRequest, res: Response, next:
       resolution,
       negativePrompt,
       provider,
+      referenceImageUrl,
+      referenceType,
+      userRightsConfirmed: Boolean(userRightsConfirmed),
       userId: req.user?.id,
     });
 

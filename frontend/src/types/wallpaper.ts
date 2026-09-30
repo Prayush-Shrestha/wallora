@@ -1,5 +1,7 @@
 export type Orientation = "portrait" | "landscape" | "square" | "ultrawide";
 export type DeviceKind = "phone" | "tablet" | "laptop" | "desktop" | "ultrawide";
+export type AssetProvenance = "ORIGINAL_AI" | "USER_UPLOAD" | "THIRD_PARTY_LICENSED" | "DEMO_PLACEHOLDER";
+export type LicenseKind = "AI_PROVIDER_TERMS" | "USER_OWNED" | "CC0_PUBLIC_DOMAIN" | "COMMERCIAL_LICENSED" | "DEMO_ONLY";
 
 export interface Wallpaper {
   id: string;
@@ -25,6 +27,10 @@ export interface Wallpaper {
   };
   isAI: boolean;
   downloads: number;
+  assetType?: AssetProvenance;
+  licenseType?: LicenseKind;
+  attribution?: string;
+  originUrl?: string;
   createdAt: string;
   updatedAt?: string;
   _count?: {

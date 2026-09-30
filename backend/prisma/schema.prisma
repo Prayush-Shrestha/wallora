@@ -48,12 +48,19 @@ model Wallpaper {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
+  // Provenance & Copyright Tracking
+  assetType    String        @default("DEMO_PLACEHOLDER") // ORIGINAL_AI | USER_UPLOAD | THIRD_PARTY_LICENSED | DEMO_PLACEHOLDER
+  licenseType  String        @default("DEMO_ONLY")        // AI_PROVIDER_TERMS | USER_OWNED | CC0_PUBLIC_DOMAIN | DEMO_ONLY
+  attribution  String?
+  originUrl    String?
+
   favorites       Favorite[]
   downloadRecords Download[]
 
   @@index([categoryId])
   @@index([orientation])
   @@index([deviceType])
+  @@index([assetType])
   @@map("wallpapers")
 }
 
@@ -92,15 +99,29 @@ model Download {
 }
 
 model AIWallpaper {
-  id          String    @id @default(cuid())
-  userId      String?
-  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  prompt      String
-  style       String?
-  orientation String?
-  resolution  String?
-  imageUrl    String
-  createdAt   DateTime  @default(now())
+  id                String    @id @default(cuid())
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  prompt            String
+  enhancedPrompt    String?
+  negativePrompt    String?
+  style             String?
+  category          String?
+  orientation       String?
+  resolution        String?
+  aspectRatio       String?
+  dimensionsWidth   Int?
+  dimensionsHeight  Int?
+  imageUrl          String
+  provider          String    @default("flux-free") // replicate | openai | flux-free
+  model             String    @default("flux")      // flux-schnell | dall-e-3 | flux
+  generationId      String?
+  assetType         String    @default("ORIGINAL_AI")
+  licenseType       String    @default("AI_PROVIDER_TERMS")
+  licenseTerms      String?
+  referenceType     String?   // NONE | USER_UPLOADED
+  referenceImageUrl String?
+  createdAt         DateTime  @default(now())
 
   @@map("ai_wallpapers")
 }

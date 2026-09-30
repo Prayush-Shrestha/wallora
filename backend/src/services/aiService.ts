@@ -4,6 +4,9 @@ import { processPrompt, PromptProcessingInput } from "../utils/promptEngine";
 export interface GenerateAIWallpaperInput extends PromptProcessingInput {
   userId?: string;
   provider?: "auto" | "replicate" | "openai" | "flux-free";
+  referenceType?: "NONE" | "USER_UPLOADED";
+  referenceImageUrl?: string;
+  userRightsConfirmed?: boolean;
 }
 
 export interface GeneratedWallpaperResult {
@@ -20,8 +23,33 @@ export interface GeneratedWallpaperResult {
   dimensions: { width: number; height: number };
   imageUrl: string;
   provider: string;
+  model: string;
+  generationId: string;
+  assetType: "ORIGINAL_AI";
+  licenseType: "AI_PROVIDER_TERMS";
+  licenseTerms: string;
+  copyrightNotice: string;
+  referenceType?: "NONE" | "USER_UPLOADED";
   createdAt: string;
 }
+
+const PROVIDER_TERMS: Record<string, { model: string; terms: string; copyrightNotice: string }> = {
+  "replicate-flux": {
+    model: "black-forest-labs/flux-schnell",
+    terms: "Flux Schnell open weights (Apache 2.0 license). Commercial and personal generation permitted by Black Forest Labs.",
+    copyrightNotice: "AI-generated output. Under US Copyright Office decisions, purely machine-generated visual works without substantial human creative input do not enjoy human copyright protection. Wallora makes no false claims of exclusive copyright.",
+  },
+  "openai-dalle3": {
+    model: "dall-e-3",
+    terms: "OpenAI Terms of Service. OpenAI assigns right and ownership in generated outputs to the creator to the extent allowed by applicable law.",
+    copyrightNotice: "AI-generated output via OpenAI DALL-E 3. Permitted for commercial and personal usage subject to OpenAI Content Policies.",
+  },
+  "flux-free": {
+    model: "flux-1-schnell",
+    terms: "Flux Diffusion open architecture (Apache 2.0 weights license). Permitted for personal and commercial wallpaper usage.",
+    copyrightNotice: "AI-generated output. Purely synthetic AI asset created via mathematical diffusion; not a reproduction of copyrighted third-party photography.",
+  },
+};
 
 // Database circuit breaker for offline or slow local database
 let lastDbFailure = 0;
@@ -181,6 +209,15 @@ async function generateViaFluxFree(
 export async function generateAIWallpaper(
   input: GenerateAIWallpaperInput
 ): Promise<GeneratedWallpaperResult> {
+  // Strict copyright safety check for reference images
+  if (input.referenceImageUrl && !input.userRightsConfirmed) {
+    const error: any = new Error(
+      "Copyright safety required: You must confirm that you own or hold the legal distribution rights to use this reference image."
+    );
+    error.statusCode = 400;
+    throw error;
+  }
+
   const startTime = Date.now();
 
   // 1. Process prompt, extract negatives, and calculate wallpaper framing
@@ -242,6 +279,9 @@ export async function generateAIWallpaper(
   const duration = Date.now() - startTime;
   console.log(`[AI Service] Generation succeeded via ${activeProvider} in ${duration}ms: ${imageUrl}`);
 
+  const genId = `gen-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const meta = PROVIDER_TERMS[activeProvider] || PROVIDER_TERMS["flux-free"];
+
   // 4. Persist to database if available
   let recordId = `ai-${Date.now()}`;
   if (Date.now() - lastDbFailure > DB_RETRY_INTERVAL) {
@@ -251,10 +291,24 @@ export async function generateAIWallpaper(
           data: {
             userId: input.userId || null,
             prompt: processed.originalPrompt,
+            enhancedPrompt: processed.enhancedPrompt,
+            negativePrompt: processed.negativePrompt,
             style: input.style || "Natural",
+            category: input.category || null,
             orientation: input.orientation || "landscape",
             resolution: input.resolution || "4k",
+            aspectRatio: processed.aspectRatio,
+            dimensionsWidth: processed.dimensions.width,
+            dimensionsHeight: processed.dimensions.height,
             imageUrl,
+            provider: activeProvider,
+            model: meta.model,
+            generationId: genId,
+            assetType: "ORIGINAL_AI",
+            licenseType: "AI_PROVIDER_TERMS",
+            licenseTerms: meta.terms,
+            referenceType: input.referenceType || (input.referenceImageUrl ? "USER_UPLOADED" : "NONE"),
+            referenceImageUrl: input.referenceImageUrl || null,
           },
         }),
         new Promise<never>((_, reject) =>
@@ -282,6 +336,13 @@ export async function generateAIWallpaper(
     dimensions: processed.dimensions,
     imageUrl,
     provider: activeProvider,
+    model: meta.model,
+    generationId: genId,
+    assetType: "ORIGINAL_AI",
+    licenseType: "AI_PROVIDER_TERMS",
+    licenseTerms: meta.terms,
+    copyrightNotice: meta.copyrightNotice,
+    referenceType: input.referenceType || (input.referenceImageUrl ? "USER_UPLOADED" : "NONE"),
     createdAt: new Date().toISOString(),
   };
 }
