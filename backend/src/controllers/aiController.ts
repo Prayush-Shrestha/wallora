@@ -4,7 +4,7 @@ import { AuthRequest } from "../types";
 
 export async function generateAIWallpaper(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { prompt, style, orientation, resolution } = req.body;
+    const { prompt, style, category, orientation, resolution, negativePrompt, provider } = req.body;
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       res.status(400).json({ success: false, error: "A descriptive prompt is required." });
@@ -14,8 +14,11 @@ export async function generateAIWallpaper(req: AuthRequest, res: Response, next:
     const wallpaper = await aiService.generateAIWallpaper({
       prompt: prompt.trim(),
       style,
+      category,
       orientation,
       resolution,
+      negativePrompt,
+      provider,
       userId: req.user?.id,
     });
 
@@ -24,8 +27,12 @@ export async function generateAIWallpaper(req: AuthRequest, res: Response, next:
       message: "AI wallpaper generated successfully.",
       data: { wallpaper },
     });
-  } catch (err) {
-    next(err);
+  } catch (err: any) {
+    console.error("[AI Controller Error]:", err?.message || err);
+    res.status(500).json({
+      success: false,
+      error: err?.message || "Failed to generate AI wallpaper. Please try again.",
+    });
   }
 }
 

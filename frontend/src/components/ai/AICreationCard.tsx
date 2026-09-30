@@ -16,6 +16,7 @@ export function AICreationCard({ creation }: AICreationCardProps) {
           src={creation.imageUrl}
           alt={`${creation.style || "AI"} wallpaper`}
           fill
+          unoptimized
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           loading="lazy"
           className="object-cover group-hover:scale-105 group-focus-within:scale-105 transition-transform duration-500"
