@@ -12,7 +12,7 @@ wallora/
 
 ---
 
-## 🏗 Architecture Overview
+##  Architecture Overview
 
 | Layer | Directory | Tech Stack | Responsibilities |
 | :--- | :--- | :--- | :--- |
@@ -21,7 +21,7 @@ wallora/
 
 ---
 
-## 📁 Project Directory Structure
+##  Project Directory Structure
 
 ```text
 wallora/
@@ -137,7 +137,7 @@ Wallora uses PostgreSQL managed via Prisma. The schema definitions include:
 
 ---
 
-## ⚡ Quick Start Guide
+##  Quick Start Guide
 
 You will run the backend and frontend in two separate terminal windows.
 
@@ -184,7 +184,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🔑 Environment Variables Reference
+##  Environment Variables Reference
 
 ### Backend (`backend/.env`)
 
@@ -207,7 +207,7 @@ NEXT_PUBLIC_APP_NAME="Wallora"
 
 ---
 
-## 🧪 Built-in Resilience & Educational Features
+##  Built-in Resilience & Educational Features
 
 - **Decoupled Architecture**: Frontend makes standard HTTP calls via its service layer (`frontend/src/services/`) to the backend Express routes (`backend/src/routes/`).
 - **Zero-Friction Fallback**: If PostgreSQL or Cloudinary credentials are not configured yet, the backend and frontend seamlessly serve curated mock data so development, visual testing, and UI navigation work out-of-the-box.
