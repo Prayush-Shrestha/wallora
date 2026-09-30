@@ -58,7 +58,7 @@ export function useTheme() {
 /** Sets the theme class before first paint to avoid a flash. */
 export function ThemeScript() {
   const js = `(function(){try{var t=localStorage.getItem('${STORAGE_KEY}')||'dark';if(t==='dark'){document.documentElement.classList.add('dark')}document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark')}})();`;
-  return <script dangerouslySetInnerHTML={{ __html: js }} />;
+  return <script dangerouslySetInnerHTML={{ __html: js }} suppressHydrationWarning />;
 }
 
 /** Sun/moon toggle for the navbar (spec: light + night mode button). */

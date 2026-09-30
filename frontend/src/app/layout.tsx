@@ -27,7 +27,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <ThemeScript />
+      <head>
+        <ThemeScript />
+      </head>
       <body className="bg-base text-strong min-h-screen flex flex-col antialiased selection:bg-accent selection:text-accent-ink">
         <ThemeProvider>
           <AuthProvider>
