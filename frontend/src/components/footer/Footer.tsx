@@ -23,7 +23,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-line/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-faint">
-          <p>© {new Date().getFullYear()} Wallora. Full-Stack Wallpaper Platform.</p>
+          <p suppressHydrationWarning>© {new Date().getFullYear()} Wallora. Full-Stack Wallpaper Platform.</p>
           <p>Educational Architecture: Independent Frontend &amp; Backend</p>
         </div>
       </div>

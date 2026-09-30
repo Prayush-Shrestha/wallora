@@ -31,8 +31,15 @@ export function SearchPanel({ categories, variant = "hero" }: SearchPanelProps) 
     const onClick = (e: MouseEvent) => {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   const go = (query: string) => {
@@ -83,18 +90,19 @@ export function SearchPanel({ categories, variant = "hero" }: SearchPanelProps) 
       </form>
 
       {open && (
-        <div className="absolute inset-x-0 top-full mt-2 rounded-2xl border border-white/10 bg-ink-900/95 backdrop-blur-xl p-4 text-left shadow-2xl z-30 space-y-4">
+        <div className="absolute inset-x-0 top-full mt-2 rounded-3xl border border-white/10 bg-ink-900/95 backdrop-blur-xl p-4 sm:p-5 text-left shadow-[0_24px_60px_-12px_rgba(0,0,0,0.7)] z-30 space-y-5 max-h-[min(70vh,380px)] overflow-y-auto">
           {recent.length > 0 && (
             <div>
-              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500 mb-2">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400 mb-2.5">
                 <Clock className="w-3 h-3" aria-hidden /> Recent
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {recent.map((r) => (
                   <button
                     key={r}
+                    type="button"
                     onClick={() => go(r)}
-                    className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-neutral-300 hover:text-white hover:border-white/25 transition"
+                    className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-neutral-200 hover:text-white hover:border-white/25 transition"
                   >
                     {r}
                   </button>
@@ -103,15 +111,16 @@ export function SearchPanel({ categories, variant = "hero" }: SearchPanelProps) 
             </div>
           )}
           <div>
-            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500 mb-2">
+            <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400 mb-2.5">
               <TrendingUp className="w-3 h-3" aria-hidden /> Trending
             </p>
             <div className="flex flex-wrap gap-1.5">
               {TRENDING.map((t) => (
                 <button
                   key={t}
+                  type="button"
                   onClick={() => go(t)}
-                  className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-neutral-300 hover:text-accent hover:border-accent/40 transition capitalize"
+                  className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-neutral-200 hover:text-accent hover:border-accent/50 hover:bg-accent/10 transition capitalize"
                 >
                   {t}
                 </button>
@@ -120,21 +129,22 @@ export function SearchPanel({ categories, variant = "hero" }: SearchPanelProps) 
           </div>
           {categories.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500 mb-2">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400 mb-2">
                 Collections
               </p>
-              <ul className="grid grid-cols-2 gap-1">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                 {categories.slice(0, 6).map((c) => (
                   <li key={c.slug}>
                     <button
+                      type="button"
                       onClick={() => {
                         setOpen(false);
                         router.push(`/category/${c.slug}`);
                       }}
-                      className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs text-neutral-300 hover:bg-white/5 hover:text-white transition"
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs text-neutral-200 hover:bg-white/5 hover:text-white transition"
                     >
-                      <span>{c.name}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-neutral-500" aria-hidden />
+                      <span className="truncate">{c.name}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-neutral-500 shrink-0 ml-2" aria-hidden />
                     </button>
                   </li>
                 ))}

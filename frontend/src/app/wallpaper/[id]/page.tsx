@@ -61,18 +61,35 @@ export default function WallpaperDetailPage({ params }: WallpaperDetailPageProps
       await wallpaperService.downloadWallpaper(wallpaper.id);
       setDownloads((prev) => prev + 1);
     } catch {
-      // Count failed — the file still opens for the user.
+      // Count failed — the file still downloads for the user.
     }
 
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 2600);
-    const link = document.createElement("a");
-    link.href = wallpaper.imageUrl;
-    link.target = "_blank";
-    link.rel = "noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+
+    // Download as a file instead of opening the image host in a new tab.
+    try {
+      const res = await fetch(wallpaper.imageUrl);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${wallpaper.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-${wallpaper.width}x${wallpaper.height}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch {
+      // Fallback: same-tab navigation so no "other website" tab opens.
+      const link = document.createElement("a");
+      link.href = wallpaper.imageUrl;
+      link.download = `${wallpaper.id}.jpg`;
+      link.rel = "noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
   };
 
   const handleToggleFavorite = async () => {

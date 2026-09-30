@@ -40,9 +40,9 @@ export default async function HomePage() {
   return (
     <div className="pb-16">
       {/* ── Hero (spec D): wallpaper centerpiece + search ── */}
-      <section className="relative -mt-16 pt-32 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+      <section className="relative -mt-16 pt-32 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6">
         {hero && (
-          <>
+          <div className="absolute inset-0 overflow-hidden" aria-hidden>
             <Image
               src={hero.imageUrl}
               alt=""
@@ -52,18 +52,12 @@ export default async function HomePage() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-black/55" aria-hidden />
-            <div
-              className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/75 to-transparent"
-              aria-hidden
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent"
-              aria-hidden
-            />
-          </>
+            <div className="absolute inset-0 bg-black/55" />
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/75 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent" />
+          </div>
         )}
-        <FadeIn className="relative max-w-3xl mx-auto text-center">
+        <FadeIn className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 border border-line/15 text-[11px] font-semibold text-neutral-200 mb-6 backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5 text-accent" aria-hidden />
             <span>{wallpapers.length * 1247}+ hand-picked 4K wallpapers</span>
