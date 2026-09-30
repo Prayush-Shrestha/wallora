@@ -23,6 +23,10 @@ export interface GeneratedWallpaperResult {
   createdAt: string;
 }
 
+// Database circuit breaker for offline or slow local database
+let lastDbFailure = 0;
+const DB_RETRY_INTERVAL = 30000;
+
 /**
  * Generate wallpaper via Replicate (Flux Schnell / SDXL)
  */
@@ -171,12 +175,6 @@ async function generateViaFluxFree(
 
   const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${targetWidth}&height=${targetHeight}&model=flux&seed=${seed}&nologo=true&negative_prompt=${encodedNegative}`;
 
-  // Validate the URL is reachable
-  const checkRes = await fetch(imageUrl, { method: "HEAD" });
-  if (!checkRes.ok) {
-    throw new Error(`Flux AI provider returned status ${checkRes.status}`);
-  }
-
   return imageUrl;
 }
 
@@ -246,20 +244,28 @@ export async function generateAIWallpaper(
 
   // 4. Persist to database if available
   let recordId = `ai-${Date.now()}`;
-  try {
-    const record = await prisma.aIWallpaper.create({
-      data: {
-        userId: input.userId || null,
-        prompt: processed.originalPrompt,
-        style: input.style || "Natural",
-        orientation: input.orientation || "landscape",
-        resolution: input.resolution || "4k",
-        imageUrl,
-      },
-    });
-    recordId = record.id;
-  } catch {
-    console.log("[AI Service] Note: Saved generated wallpaper in memory (database offline)");
+  if (Date.now() - lastDbFailure > DB_RETRY_INTERVAL) {
+    try {
+      const record = await Promise.race([
+        prisma.aIWallpaper.create({
+          data: {
+            userId: input.userId || null,
+            prompt: processed.originalPrompt,
+            style: input.style || "Natural",
+            orientation: input.orientation || "landscape",
+            resolution: input.resolution || "4k",
+            imageUrl,
+          },
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Database connection timeout")), 1500)
+        ),
+      ]);
+      recordId = record.id;
+    } catch {
+      lastDbFailure = Date.now();
+      console.log("[AI Service] Note: Saved generated wallpaper in memory (database offline)");
+    }
   }
 
   return {
