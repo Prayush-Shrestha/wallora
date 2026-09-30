@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config, { dev }) => {
+    // Disable Webpack disk pack file cache in development on Windows
+    // to prevent PackFileCacheStrategy ENOENT .pack.gz file lock errors
+    if (dev) {
+      config.cache = false;
+    }
+    return config;
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
