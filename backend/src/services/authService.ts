@@ -30,11 +30,13 @@ export async function register(name: string, email: string, password: string) {
       name: true,
       email: true,
       profileImage: true,
+      role: true,
+      status: true,
       createdAt: true,
     },
   });
 
-  const token = signToken({ id: user.id, email: user.email, name: user.name });
+  const token = signToken({ id: user.id, email: user.email, name: user.name, role: user.role });
 
   return { user, token };
 }
@@ -59,7 +61,16 @@ export async function login(email: string, password: string) {
     throw error;
   }
 
-  const token = signToken({ id: user.id, email: user.email, name: user.name });
+  if (user.status === "SUSPENDED") {
+    const error: any = new Error("This account has been suspended. Please contact support.");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const token = signToken({ id: user.id, email: user.email, name: user.name, role: user.role });
+
+  // Track last login (fire-and-forget — login succeeds even if this fails)
+  prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } }).catch(() => {});
 
   return {
     user: {
@@ -67,6 +78,8 @@ export async function login(email: string, password: string) {
       name: user.name,
       email: user.email,
       profileImage: user.profileImage,
+      role: user.role,
+      status: user.status,
       createdAt: user.createdAt,
     },
     token,
@@ -81,6 +94,8 @@ export async function getUserProfile(id: string) {
       name: true,
       email: true,
       profileImage: true,
+      role: true,
+      status: true,
       createdAt: true,
       _count: {
         select: {
@@ -95,6 +110,12 @@ export async function getUserProfile(id: string) {
   if (!user) {
     const error: any = new Error("User not found.");
     error.statusCode = 404;
+    throw error;
+  }
+
+  if (user.status === "SUSPENDED") {
+    const error: any = new Error("This account has been suspended. Please contact support.");
+    error.statusCode = 403;
     throw error;
   }
 

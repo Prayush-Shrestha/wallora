@@ -11,24 +11,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+          <label className="block text-xs font-semibold text-muted uppercase tracking-wider">
             {label}
           </label>
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-faint pointer-events-none">
               {icon}
             </div>
           )}
           <input
             ref={ref}
-            className={`w-full rounded-xl bg-ink-950 border text-sm text-white placeholder:text-neutral-500 py-3 transition-colors focus:outline-none ${
+            className={`w-full rounded-xl bg-base border text-sm text-strong placeholder:text-faint py-3 transition-colors focus:outline-none ${
               icon ? "pl-10 pr-4" : "px-4"
             } ${
               error
                 ? "border-red-500/50 focus:border-red-500"
-                : "border-white/10 focus:border-accent"
+                : "border-line/10 focus:border-accent"
             } ${className}`}
             {...props}
           />

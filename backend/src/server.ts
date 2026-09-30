@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import favoriteRoutes from "./routes/favoriteRoutes";
 import userRoutes from "./routes/userRoutes";
 import aiRoutes from "./routes/aiRoutes";
+import adminRoutes from "./routes/adminRoutes";
 import { notFoundHandler, errorHandler } from "./middleware/errorMiddleware";
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error Handling
 app.use(notFoundHandler);

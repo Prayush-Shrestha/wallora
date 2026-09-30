@@ -10,7 +10,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Link
       href={`/category/${category.slug}`}
-      className="group relative rounded-2xl overflow-hidden aspect-[16/10] bg-ink-900 border border-white/10 hover:border-accent/50 transition-all duration-300 block"
+      className="group relative rounded-2xl overflow-hidden aspect-[16/10] bg-raised border border-line/10 hover:border-accent/50 focus-visible:border-accent transition-all duration-300 block"
     >
       {category.image && (
         <Image
@@ -18,6 +18,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
           alt={category.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          loading="lazy"
           className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-70 group-hover:opacity-90"
         />
       )}

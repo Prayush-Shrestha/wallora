@@ -3,13 +3,32 @@
 @tailwind utilities;
 
 :root {
-  --background: #08090C;
-  --foreground: #F5F5F5;
+  color-scheme: light;
+  --base: 255 255 255;
+  --raised: 244 244 245;
+  --line: 24 24 27;
+  --strong: 24 24 27;
+  --muted: 82 82 91;
+  --faint: 113 113 122;
+  --accent: 180 83 9;
+  --on-accent: 255 255 255;
+}
+
+.dark {
+  color-scheme: dark;
+  --base: 8 9 12;
+  --raised: 13 15 20;
+  --line: 255 255 255;
+  --strong: 255 255 255;
+  --muted: 163 163 163;
+  --faint: 115 115 115;
+  --accent: 229 169 60;
+  --on-accent: 13 9 3;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: rgb(var(--strong));
+  background: rgb(var(--base));
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
 }
@@ -20,13 +39,44 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #08090C;
+  background: rgb(var(--base));
 }
 ::-webkit-scrollbar-thumb {
-  background: #20242D;
+  background: rgb(var(--line) / 0.25);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2C323E;
+  background: rgb(var(--line) / 0.4);
+}
+
+/* Visible keyboard focus (spec U) — inputs keep their border treatment,
+   everything else gets a consistent accent ring. */
+:focus-visible {
+  outline: 2px solid #E5A93C;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Hide scrollbars for horizontal scrollers while keeping scrollability */
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Respect users who prefer reduced motion (spec V) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

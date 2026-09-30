@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   profileImage?: string;
+  role?: string;
+  status?: string;
   createdAt: string;
   _count?: {
     favorites: number;

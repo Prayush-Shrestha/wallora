@@ -6,6 +6,7 @@ import { Wallpaper, WallpaperFilterParams } from "../../types/wallpaper";
 import { WallpaperGrid } from "../../components/wallpaper/WallpaperGrid";
 import { WallpaperFilter } from "../../components/wallpaper/WallpaperFilter";
 import { FadeIn } from "../../components/ui/FadeIn";
+import { SkeletonGrid } from "../../components/ui/Skeleton";
 import * as wallpaperService from "../../services/wallpaperService";
 import { CATEGORIES, MOCK_WALLPAPERS } from "../../lib/data";
 
@@ -110,10 +111,10 @@ function ExploreContent() {
     <div className="mx-auto max-w-shell px-4 sm:px-6 py-8 space-y-8">
       <FadeIn>
         <div>
-          <h1 className="font-display text-3xl font-black text-white tracking-tight">
+          <h1 className="font-display text-3xl font-black text-strong tracking-tight">
             Explore Wallpapers
           </h1>
-          <p className="mt-1 text-sm text-neutral-400">
+          <p className="mt-1 text-sm text-muted">
             Browse our entire collection filtered by device, style, and orientation.
           </p>
         </div>
@@ -121,10 +122,19 @@ function ExploreContent() {
 
       <WallpaperFilter filters={filters} onChange={handleFilterChange} categories={CATEGORIES} />
 
+      {!loading && (
+        <p className="text-xs text-faint" role="status">
+          {wallpapers.length} {wallpapers.length === 1 ? "wallpaper" : "wallpapers"}
+          {filters.q && (
+            <>
+              {" "}for <span className="text-muted">“{filters.q}”</span>
+            </>
+          )}
+        </p>
+      )}
+
       {loading ? (
-        <div className="text-center py-24 text-neutral-500 text-sm">
-          Loading wallpapers...
-        </div>
+        <SkeletonGrid />
       ) : (
         <WallpaperGrid
           wallpapers={wallpapers}
@@ -137,13 +147,7 @@ function ExploreContent() {
 
 export default function ExplorePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto max-w-shell px-4 sm:px-6 py-12 text-center text-neutral-500 text-sm">
-          Loading explore page...
-        </div>
-      }
-    >
+    <Suspense fallback={<SkeletonGrid message="Loading explore page..." />}>
       <ExploreContent />
     </Suspense>
   );

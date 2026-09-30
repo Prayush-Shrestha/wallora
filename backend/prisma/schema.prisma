@@ -13,13 +13,18 @@ model User {
   email        String        @unique
   password     String
   profileImage String?
+  role         String        @default("USER") // USER | ADMIN
+  status       String        @default("ACTIVE") // ACTIVE | SUSPENDED
+  lastLoginAt  DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  wallpapers   Wallpaper[]
-  favorites    Favorite[]
-  downloads    Download[]
-  aiWallpapers AIWallpaper[]
+  wallpapers    Wallpaper[]
+  favorites     Favorite[]
+  downloads     Download[]
+  aiWallpapers  AIWallpaper[]
+  subscriptions Subscription[]
+  payments      Payment[]
 
   @@map("users")
 }
@@ -98,4 +103,65 @@ model AIWallpaper {
   createdAt   DateTime  @default(now())
 
   @@map("ai_wallpapers")
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique // free | pro-monthly | pro-yearly
+  description String?
+  priceCents  Int      @default(0)
+  currency    String   @default("USD")
+  interval    String   @default("NONE") // NONE | MONTH | YEAR
+  features    String[] @default([])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId            String
+  plan              Plan      @relation(fields: [planId], references: [id])
+  status            String    @default("ACTIVE") // ACTIVE | CANCELED | EXPIRED | PAST_DUE
+  provider          String    @default("MANUAL") // MANUAL | STRIPE | ...
+  providerRef       String?
+  currentPeriodStart DateTime @default(now())
+  currentPeriodEnd  DateTime?
+  cancelAtPeriodEnd Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  payments Payment[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId         String?
+  plan           Plan?     @relation(fields: [planId], references: [id], onDelete: SetNull)
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  amountCents    Int
+  currency       String    @default("USD")
+  status         String    @default("COMPLETED") // PENDING | COMPLETED | FAILED | REFUNDED
+  provider       String    @default("MANUAL")
+  providerRef    String?
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@map("payments")
 }

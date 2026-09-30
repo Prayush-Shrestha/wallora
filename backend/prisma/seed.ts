@@ -40,18 +40,72 @@ const WALLPAPERS = [
 async function seed() {
   console.log("🌱 Seeding database...");
 
-  // 1. Create Demo User
+  // 1. Create Demo User (platform admin)
   const password = await bcrypt.hash("password123", 10);
   const user = await prisma.user.upsert({
     where: { email: "demo@wallora.com" },
-    update: {},
+    update: { role: "ADMIN", status: "ACTIVE", lastLoginAt: new Date() },
     create: {
       name: "Demo Explorer",
       email: "demo@wallora.com",
       password,
       profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      role: "ADMIN",
     },
   });
+
+  // 1b. Subscription plans
+  const plans = [
+    { name: "Free", slug: "free", description: "Browse and download community wallpapers.", priceCents: 0, currency: "USD", interval: "NONE", features: ["Unlimited browsing", "HD downloads", "Favorites"] },
+    { name: "Pro Monthly", slug: "pro-monthly", description: "4K downloads, AI Studio priority and no limits.", priceCents: 499, currency: "USD", interval: "MONTH", features: ["4K downloads", "AI Studio priority", "Early collections"] },
+    { name: "Pro Yearly", slug: "pro-yearly", description: "Two months free on the yearly Pro plan.", priceCents: 3999, currency: "USD", interval: "YEAR", features: ["4K downloads", "AI Studio priority", "Early collections"] },
+  ];
+  const planMap = new Map<string, string>();
+  for (const p of plans) {
+    const plan = await prisma.plan.upsert({
+      where: { slug: p.slug },
+      update: { name: p.name, description: p.description, priceCents: p.priceCents, interval: p.interval, features: p.features, isActive: true },
+      create: p,
+    });
+    planMap.set(p.slug, plan.id);
+  }
+
+  // 1c. Sample paid subscriber so the admin panel has billing data
+  const paidUser = await prisma.user.upsert({
+    where: { email: "pro@wallora.com" },
+    update: { lastLoginAt: new Date() },
+    create: {
+      name: "Pro Member",
+      email: "pro@wallora.com",
+      password,
+      profileImage: "https://api.dicebear.com/7.x/identicon/svg?seed=Pro%20Member",
+    },
+  });
+  const existingSub = await prisma.subscription.findFirst({
+    where: { userId: paidUser.id, status: "ACTIVE" },
+  });
+  if (!existingSub) {
+    const sub = await prisma.subscription.create({
+      data: {
+        userId: paidUser.id,
+        planId: planMap.get("pro-monthly")!,
+        status: "ACTIVE",
+        provider: "MANUAL",
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    });
+    await prisma.payment.create({
+      data: {
+        userId: paidUser.id,
+        planId: planMap.get("pro-monthly")!,
+        subscriptionId: sub.id,
+        amountCents: 499,
+        currency: "USD",
+        status: "COMPLETED",
+        provider: "MANUAL",
+      },
+    });
+  }
 
   // 2. Create Categories
   const categoryMap = new Map<string, string>();

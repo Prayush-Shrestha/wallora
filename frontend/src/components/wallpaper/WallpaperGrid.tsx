@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Wallpaper } from "../../types/wallpaper";
 import { WallpaperCard } from "./WallpaperCard";
 
@@ -5,17 +6,41 @@ interface WallpaperGridProps {
   wallpapers: Wallpaper[];
   favoriteIds?: string[];
   emptyMessage?: string;
+  /** Editorial masonry flow (spec E) or uniform grid. */
+  layout?: "grid" | "masonry";
 }
 
 export function WallpaperGrid({
   wallpapers,
   favoriteIds = [],
   emptyMessage = "No wallpapers found.",
+  layout = "grid",
 }: WallpaperGridProps) {
+  const favoriteSet = useMemo(() => new Set(favoriteIds), [favoriteIds]);
+
   if (wallpapers.length === 0) {
     return (
-      <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl">
-        <p className="text-neutral-400 text-sm">{emptyMessage}</p>
+      <div
+        role="status"
+        className="text-center py-20 border border-dashed border-line/10 rounded-2xl"
+      >
+        <p className="text-muted text-sm">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  if (layout === "masonry") {
+    return (
+      <div className="columns-2 md:columns-3 gap-4 sm:gap-6 [column-fill:balance]">
+        {wallpapers.map((wallpaper) => (
+          <div key={wallpaper.id} className="mb-4 sm:mb-6 break-inside-avoid">
+            <WallpaperCard
+              wallpaper={wallpaper}
+              isFavoritedInitially={favoriteSet.has(wallpaper.id)}
+              naturalAspect
+            />
+          </div>
+        ))}
       </div>
     );
   }
@@ -26,10 +51,9 @@ export function WallpaperGrid({
         <WallpaperCard
           key={wallpaper.id}
           wallpaper={wallpaper}
-          isFavoritedInitially={favoriteIds.includes(wallpaper.id)}
+          isFavoritedInitially={favoriteSet.has(wallpaper.id)}
         />
       ))}
     </div>
   );
 }
-

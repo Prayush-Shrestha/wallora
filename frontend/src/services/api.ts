@@ -35,7 +35,10 @@ export async function apiClient<T = any>(
     }
 
     return data;
-  } catch (err: any) {
-    throw new Error(err.message || "Network error. Please ensure the backend is running.");
+  } catch (err) {
+    if (err instanceof Error) throw err;
+    throw new Error("Network error. Please ensure the backend is running.", {
+      cause: err,
+    });
   }
 }

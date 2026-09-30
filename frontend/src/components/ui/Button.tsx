@@ -30,8 +30,8 @@ export function Button({
   const variants = {
     primary: "bg-accent text-accent-ink hover:brightness-110 shadow-sm",
     secondary: "bg-white text-black hover:bg-neutral-200 shadow-sm",
-    outline: "border border-white/15 bg-white/5 text-white hover:bg-white/10 hover:border-white/30",
-    ghost: "text-neutral-300 hover:text-white hover:bg-white/10",
+    outline: "border border-line/15 bg-line/5 text-strong hover:bg-line/10 hover:border-line/30",
+    ghost: "text-muted hover:text-strong hover:bg-line/10",
     danger: "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20",
   };
 

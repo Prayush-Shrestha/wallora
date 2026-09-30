@@ -32,8 +32,8 @@ export default function RegisterPage() {
     try {
       await register(name, email, password);
       router.push("/profile");
-    } catch (err: any) {
-      setError(err.message || "Failed to create account. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : "Failed to create account. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -43,81 +43,86 @@ export default function RegisterPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <FadeIn className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block font-display font-black text-3xl tracking-tight text-white">
+          <Link href="/" className="inline-block font-display font-black text-3xl tracking-tight text-strong">
             WALLORA<span className="text-accent">.</span>
           </Link>
-          <h1 className="mt-3 font-display text-2xl font-bold text-white tracking-tight">
+          <h1 className="mt-3 font-display text-2xl font-bold text-strong tracking-tight">
             Create an account
           </h1>
-          <p className="mt-1 text-xs text-neutral-400">
+          <p className="mt-1 text-xs text-muted">
             Join Wallora to save favorites, download 4K wallpapers and generate AI art.
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-ink-900/80 backdrop-blur-xl p-6 sm:p-8 shadow-2xl">
+        <div className="rounded-3xl border border-line/10 bg-raised/80 backdrop-blur-xl p-6 sm:p-8 shadow-2xl">
           {error && (
-            <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-3.5 text-xs text-red-400">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+            <div role="alert" className="mb-5 flex items-center gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-3.5 text-xs text-red-400">
+              <AlertCircle className="w-4 h-4 shrink-0" aria-hidden />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
+              <label htmlFor="register-name" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                 Full Name or Creator Handle
               </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-faint pointer-events-none" aria-hidden />
                 <input
+                  id="register-name"
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Alex Rivera"
-                  className="w-full rounded-xl bg-ink-950 border border-white/10 pl-10 pr-4 py-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-accent transition-colors"
+                  className="w-full rounded-xl bg-base border border-line/10 pl-10 pr-4 py-3 text-sm text-strong placeholder:text-faint focus:outline-none focus:border-accent transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
+              <label htmlFor="register-email" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-faint pointer-events-none" aria-hidden />
                 <input
+                  id="register-email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl bg-ink-950 border border-white/10 pl-10 pr-4 py-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-accent transition-colors"
+                  className="w-full rounded-xl bg-base border border-line/10 pl-10 pr-4 py-3 text-sm text-strong placeholder:text-faint focus:outline-none focus:border-accent transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider mb-2">
+              <label htmlFor="register-password" className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
                 Password (min 6 characters)
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-faint pointer-events-none" aria-hidden />
                 <input
+                  id="register-password"
                   type={showPassword ? "text" : "password"}
                   required
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-xl bg-ink-950 border border-white/10 pl-10 pr-11 py-3 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-accent transition-colors"
+                  className="w-full rounded-xl bg-base border border-line/10 pl-10 pr-11 py-3 text-sm text-strong placeholder:text-faint focus:outline-none focus:border-accent transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white"
+                  aria-pressed={showPassword}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-strong"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" aria-hidden /> : <Eye className="w-4 h-4" aria-hidden />}
                 </button>
               </div>
             </div>
@@ -125,7 +130,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-accent text-accent-ink font-bold text-sm py-3.5 hover:brightness-110 active:scale-98 transition disabled:opacity-50"
+              className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-accent text-accent-ink font-bold text-sm py-3.5 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -141,7 +146,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-neutral-400">
+          <p className="mt-6 text-center text-xs text-muted">
             Already have an account?{" "}
             <Link href="/login" className="font-semibold text-accent hover:underline">
               Log in
