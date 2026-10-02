@@ -4,6 +4,7 @@ import { AuthProvider } from "../hooks/useAuth";
 import { Navbar } from "../components/navbar/Navbar";
 import { Footer } from "../components/footer/Footer";
 import { Toaster } from "../components/ui/Toast";
+import { Chatbot } from "../components/chat/Chatbot";
 import { ThemeProvider, ThemeScript } from "../components/ui/Theme";
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 pt-16">{children}</main>
             <Footer />
             <Toaster />
+            <Chatbot />
           </AuthProvider>
         </ThemeProvider>
       </body>

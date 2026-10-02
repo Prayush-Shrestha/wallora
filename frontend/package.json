@@ -4,9 +4,9 @@
   "private": true,
   "description": "Wallora Frontend with Next.js, React, TypeScript & Tailwind CSS",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3002",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3002",
     "lint": "next lint"
   },
   "dependencies": {
