@@ -93,7 +93,7 @@ export default async function HomePage() {
               </p>
               <Link
                 href={`/wallpaper/${ofTheDay.id}`}
-                className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-strong text-white text-sm font-bold hover:bg-accent hover:text-accent-ink transition"
+                className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-strong text-base text-sm font-bold hover:bg-accent hover:text-accent-ink transition"
               >
                 <span>View wallpaper</span>
                 <ArrowRight className="w-4 h-4" aria-hidden />

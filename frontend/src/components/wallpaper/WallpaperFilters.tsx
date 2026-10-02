@@ -83,7 +83,7 @@ export function WallpaperFilters({ filters, onChange, categories = [] }: Wallpap
             aria-pressed={(filters.category || "all") === "all"}
             className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
               (filters.category || "all") === "all"
-                ? "bg-strong text-white"
+                ? "bg-strong text-base"
                 : "bg-line/5 text-muted hover:bg-line/10 hover:text-strong"
             }`}
           >
@@ -98,7 +98,7 @@ export function WallpaperFilters({ filters, onChange, categories = [] }: Wallpap
                 aria-pressed={active}
                 className={`px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
                   active
-                    ? "bg-strong text-white"
+                    ? "bg-strong text-base"
                     : "bg-line/5 text-muted hover:bg-line/10 hover:text-strong"
                 }`}
               >
