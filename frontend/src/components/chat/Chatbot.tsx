@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 interface BotAction {
   label: string;
@@ -15,12 +16,13 @@ interface ChatMessage {
   action?: BotAction;
 }
 
-const QUICK_QUESTIONS = [
+const USER_QUICK_QUESTIONS = [
   "Where are AI wallpapers?",
   "How do I download?",
   "Demo login?",
-  "Open Admin Panel",
 ];
+
+const ADMIN_QUICK_QUESTIONS = [...USER_QUICK_QUESTIONS, "Open Admin Panel"];
 
 const GREETING: ChatMessage = {
   from: "bot",
@@ -28,14 +30,21 @@ const GREETING: ChatMessage = {
 };
 
 // Simple keyword-based helper — no external API, easy to extend.
-function getBotReply(input: string): ChatMessage {
+// Admin topics are only answered for admins; regular users never see them.
+function getBotReply(input: string, isAdmin: boolean): ChatMessage {
   const q = input.toLowerCase();
 
   if (q.includes("admin")) {
+    if (!isAdmin) {
+      return {
+        from: "bot",
+        text: "That area is restricted to site admins. I can help you with wallpapers, categories, AI Studio, or your account instead.",
+      };
+    }
     return {
       from: "bot",
-      text: "The Admin Panel lives at /admin (Overview, Users, Subscriptions, Payments, Plans). Log in with the demo admin account first, then open it.",
-      action: { label: "Open Admin Panel", href: "/admin" },
+      text: "Sign in on the Admin login page with an ADMIN account, then you'll reach the dashboard with Users, Subscriptions, Payments, and Plans.",
+      action: { label: "Open Admin login", href: "/admin/login" },
     };
   }
   if (q.includes("ai") || q.includes("generate")) {
@@ -117,12 +126,17 @@ function getBotReply(input: string): ChatMessage {
 
   return {
     from: "bot",
-    text: "I can help with Explore, Categories, Collections, AI Studio, Upload, Favorites, login, and the Admin Panel. What are you looking for?",
+    text: isAdmin
+      ? "I can help with Explore, Categories, Collections, AI Studio, Upload, Favorites, login, and the Admin Panel. What are you looking for?"
+      : "I can help with Explore, Categories, Collections, AI Studio, Upload, Favorites, and login. What are you looking for?",
   };
 }
 
 export function Chatbot() {
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
+  const quickQuestions = isAdmin ? ADMIN_QUICK_QUESTIONS : USER_QUICK_QUESTIONS;
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [draft, setDraft] = useState("");
@@ -144,7 +158,7 @@ export function Chatbot() {
   const send = (text: string) => {
     const clean = text.trim();
     if (!clean) return;
-    setMessages((prev) => [...prev, { from: "user", text: clean }, getBotReply(clean)]);
+    setMessages((prev) => [...prev, { from: "user", text: clean }, getBotReply(clean, isAdmin)]);
     setDraft("");
   };
 
@@ -201,7 +215,7 @@ export function Chatbot() {
           </div>
 
           <div className="px-3 pb-2 flex flex-wrap gap-1.5">
-            {QUICK_QUESTIONS.map((q) => (
+            {quickQuestions.map((q) => (
               <button
                 key={q}
                 onClick={() => send(q)}

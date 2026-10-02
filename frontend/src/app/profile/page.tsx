@@ -18,13 +18,16 @@ import * as aiService from "../../services/aiService";
 // /profile — header + tabs + saved / created grids.
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTab>("favorites");
   const [favorites, setFavorites] = useState<Wallpaper[]>([]);
   const [creations, setCreations] = useState<AIWallpaper[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for the auth check — otherwise a hard refresh bounces
+    // logged-in users to /login before refreshUser() finishes.
+    if (authLoading) return;
     if (!user) {
       router.push("/login");
       return;
@@ -45,7 +48,15 @@ export default function ProfilePage() {
     }
 
     loadData();
-  }, [user, router]);
+  }, [user, router, authLoading]);
+
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-shell px-4 sm:px-6 py-8">
+        <div className="text-center py-20 text-faint text-sm">Checking your session...</div>
+      </div>
+    );
+  }
 
   if (!user) return null;
 

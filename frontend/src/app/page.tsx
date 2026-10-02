@@ -17,10 +17,16 @@ export const revalidate = 60;
 export default async function HomePage() {
   let wallpapers = MOCK_WALLPAPERS;
 
+  // Never let a slow backend stall the homepage: give it 3s, then use mocks.
+  // (AI generation intentionally has no such cap — it can take 30s+.)
   try {
-    const data = await wallpaperService.fetchWallpapers({ limit: 24, sort: "trending" });
-    if (data?.wallpapers?.length > 0) {
-      wallpapers = data.wallpapers;
+    const data = await Promise.race([
+      wallpaperService.fetchWallpapers({ limit: 24, sort: "trending" }),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+    ]);
+    const fresh = data?.wallpapers;
+    if (fresh && fresh.length > 0) {
+      wallpapers = fresh;
     }
   } catch {
     // Graceful fallback to mock data

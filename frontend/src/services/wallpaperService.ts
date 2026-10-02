@@ -45,13 +45,5 @@ export async function downloadWallpaper(id: string) {
   return res.data;
 }
 
-export async function uploadWallpaper(formData: FormData) {
-  const res = await apiClient<{ success: boolean; message: string; data: { wallpaper: Wallpaper } }>(
-    "/wallpapers",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
-  return res.data;
-}
+// NOTE: uploads go through services/uploadService.ts uploadWallpaper(input),
+// which builds the FormData (file + metadata) in one place.

@@ -31,6 +31,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
     >
       <button
+        type="button"
         aria-label="Close dialog"
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -41,6 +42,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             <h2 className="font-display text-lg font-bold text-strong">{title}</h2>
           )}
           <button
+            type="button"
             onClick={onClose}
             aria-label="Close"
             className="ml-auto p-2 rounded-full text-muted hover:text-strong hover:bg-line/10 transition"

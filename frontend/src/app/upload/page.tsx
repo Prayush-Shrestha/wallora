@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Upload as UploadIcon, Loader2, AlertCircle, ImagePlus } from "lucide-react";
@@ -27,6 +27,13 @@ export default function UploadPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Revoke the previous preview URL so repeated picks don't leak memory.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const handleFile = (f: File | undefined) => {
     if (!f) return;
     if (!f.type.startsWith("image/")) {
@@ -35,7 +42,10 @@ export default function UploadPage() {
     }
     setError(null);
     setFile(f);
-    setPreviewUrl(URL.createObjectURL(f));
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(f);
+    });
     if (!title) setTitle(f.name.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " "));
   };
 

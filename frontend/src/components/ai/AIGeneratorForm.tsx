@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Wand2,
   Loader2,
@@ -63,6 +63,12 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
   const [negativePrompt, setNegativePrompt] = useState("");
   const [provider, setProvider] = useState<"auto" | "flux-free" | "replicate" | "openai">("auto");
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Sync when the parent passes a new prompt (e.g. after "Edit prompt" —
+  // without this the textarea keeps the stale pre-generation value).
+  useEffect(() => {
+    setPrompt(initialPrompt);
+  }, [initialPrompt]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -11,12 +11,15 @@ import * as favoriteService from "../../services/favoriteService";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function FavoritesPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [favorites, setFavorites] = useState<Wallpaper[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      // Wait for the session check so a hard refresh doesn't flash the
+      // logged-out prompt for users with a valid token.
+      if (authLoading) return;
       if (user) {
         try {
           const list = await favoriteService.fetchFavorites();
@@ -31,7 +34,15 @@ export default function FavoritesPage() {
       }
     }
     load();
-  }, [user]);
+  }, [user, authLoading]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="mx-auto max-w-shell px-4 sm:px-6 py-8">
+        <SkeletonGrid message="Loading your favorites..." />
+      </div>
+    );
+  }
 
   if (!user) {
     return (

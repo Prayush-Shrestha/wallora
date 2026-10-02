@@ -23,8 +23,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const u = await authService.getMe();
       setUser(u);
-    } catch {
-      setUser(null);
+    } catch (err) {
+      // Backend unreachable (backend down, offline): keep the cached user so
+      // the UI doesn't log people out on a network blip. A real 401 (bad or
+      // expired token) still clears the session.
+      if (err instanceof TypeError || (err instanceof Error && /failed to fetch|network error|load failed/i.test(err.message))) {
+        setUser(authService.getStoredUser());
+      } else {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }

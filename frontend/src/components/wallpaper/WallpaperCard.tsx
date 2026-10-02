@@ -96,22 +96,6 @@ export function WallpaperCard({
             </div>
           )}
 
-          {/* Favorite Button */}
-          <button
-            onClick={handleFavoriteClick}
-            disabled={loadingFav}
-            aria-label={favorited ? `Remove ${wallpaper.title} from favorites` : `Save ${wallpaper.title} to favorites`}
-            aria-pressed={favorited}
-            className="absolute top-3 right-3 p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white hover:text-red-400 hover:scale-110 active:scale-95 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100"
-          >
-            <Heart
-              className={`w-4 h-4 transition-colors ${pop ? "animate-fav-pop" : ""} ${
-                favorited ? "fill-red-500 text-red-500" : "text-white"
-              }`}
-              aria-hidden
-            />
-          </button>
-
           {/* Bottom Hover Overlay */}
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 flex items-end justify-between sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity duration-200">
             <div className="truncate mr-2">
@@ -130,6 +114,23 @@ export function WallpaperCard({
           </div>
         </div>
       </Link>
+
+      {/* Favorite button lives OUTSIDE the link — a <button> inside an <a>
+          is invalid HTML and breaks keyboard/screen-reader navigation. */}
+      <button
+        onClick={handleFavoriteClick}
+        disabled={loadingFav}
+        aria-label={favorited ? `Remove ${wallpaper.title} from favorites` : `Save ${wallpaper.title} to favorites`}
+        aria-pressed={favorited}
+        className="absolute top-3 right-3 p-2 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white hover:text-red-400 hover:scale-110 active:scale-95 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus-visible:opacity-100"
+      >
+        <Heart
+          className={`w-4 h-4 transition-colors ${pop ? "animate-fav-pop" : ""} ${
+            favorited ? "fill-red-500 text-red-500" : "text-white"
+          }`}
+          aria-hidden
+        />
+      </button>
     </div>
   );
 }

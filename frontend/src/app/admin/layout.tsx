@@ -26,6 +26,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  // The admin sign-in page must render without an admin session.
+  if (pathname === "/admin/login") {
+    return (
+      <div className="mx-auto max-w-shell px-4 sm:px-6 py-8">
+        {children}
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="mx-auto max-w-shell px-4 py-24 text-center">
@@ -36,8 +45,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             You need to log in with an <span className="font-bold text-strong">ADMIN</span> account to view this page.
           </p>
           <div className="flex items-center justify-center gap-2 pt-2">
-            <Link href="/login" className="px-5 py-2.5 rounded-xl bg-accent text-accent-ink text-xs font-bold hover:brightness-110 transition">
-              Go to login
+            <Link href="/admin/login" className="px-5 py-2.5 rounded-xl bg-accent text-accent-ink text-xs font-bold hover:brightness-110 transition">
+              Go to admin login
             </Link>
             <Link href="/" className="px-5 py-2.5 rounded-xl border border-line/15 text-xs font-semibold text-muted hover:text-strong transition">
               Back to site

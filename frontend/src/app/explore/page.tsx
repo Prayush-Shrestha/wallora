@@ -47,7 +47,7 @@ function applyMockFilters(filters: WallpaperFilterParams): Wallpaper[] {
   const sort = filters.sort ?? "trending";
   filtered.sort((a, b) => {
     if (sort === "downloads" || sort === "trending") {
-      if (b.downloads !== a.downloads) return b.downloads - a.downloads;
+      if ((b.downloads || 0) !== (a.downloads || 0)) return (b.downloads || 0) - (a.downloads || 0);
     }
     return +new Date(b.createdAt) - +new Date(a.createdAt);
   });
@@ -82,22 +82,31 @@ function ExploreContent() {
   const [wallpapers, setWallpapers] = useState<Wallpaper[]>(MOCK_WALLPAPERS);
   const [loading, setLoading] = useState(false);
 
+  // Debounce the search text so typing doesn't fire a request per keystroke.
+  // The input stays instant (filters.q); only fetching waits 350ms.
+  const [debouncedQ, setDebouncedQ] = useState(filters.q ?? "");
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(filters.q ?? ""), 350);
+    return () => clearTimeout(t);
+  }, [filters.q]);
+
   const loadWallpapers = useCallback(async () => {
+    const effective = { ...filters, q: debouncedQ };
     setLoading(true);
     try {
-      const data = await wallpaperService.fetchWallpapers(filters);
+      const data = await wallpaperService.fetchWallpapers(effective);
       if (data?.wallpapers) {
         setWallpapers(data.wallpapers);
       } else {
-        setWallpapers(applyMockFilters(filters));
+        setWallpapers(applyMockFilters(effective));
       }
     } catch {
       // Backend offline — filter bundled mock data in-memory.
-      setWallpapers(applyMockFilters(filters));
+      setWallpapers(applyMockFilters(effective));
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, debouncedQ]);
 
   useEffect(() => {
     loadWallpapers();

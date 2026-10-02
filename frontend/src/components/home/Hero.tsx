@@ -37,7 +37,7 @@ export function Hero({ hero, totalCount, categories }: HeroProps) {
       <FadeIn className="relative z-10 max-w-3xl mx-auto text-center">
         <p className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 border border-line/15 text-[11px] font-semibold text-neutral-200 mb-6 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5 text-accent" aria-hidden />
-          <span>{totalCount * 1247}+ hand-picked 4K wallpapers</span>
+          <span>{totalCount} hand-picked 4K wallpapers</span>
         </p>
 
         <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] text-white text-balance">

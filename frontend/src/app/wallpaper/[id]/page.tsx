@@ -32,6 +32,7 @@ export default function WallpaperDetailPage({ params }: WallpaperDetailPageProps
   const [favorited, setFavorited] = useState(false);
   const [loading, setLoading] = useState(true);
   const [downloaded, setDownloaded] = useState(false);
+  const [missing, setMissing] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -42,12 +43,20 @@ export default function WallpaperDetailPage({ params }: WallpaperDetailPageProps
           setWallpaper(data.wallpaper);
           setSimilar(data.similar || []);
           setDownloads(data.wallpaper.downloads || 0);
+        } else {
+          setMissing(true);
         }
       } catch {
-        const local = MOCK_WALLPAPERS.find((w) => w.id === id) || MOCK_WALLPAPERS[0];
-        setWallpaper(local);
-        setSimilar(MOCK_WALLPAPERS.filter((w) => w.id !== local.id).slice(0, 4));
-        setDownloads(local.downloads || 0);
+        // Backend offline — fall back to bundled mock data, but never show
+        // the wrong wallpaper for an unknown id.
+        const local = MOCK_WALLPAPERS.find((w) => w.id === id);
+        if (!local) {
+          setMissing(true);
+        } else {
+          setWallpaper(local);
+          setSimilar(MOCK_WALLPAPERS.filter((w) => w.id !== local.id).slice(0, 4));
+          setDownloads(local.downloads || 0);
+        }
       } finally {
         setLoading(false);
       }
@@ -119,10 +128,27 @@ export default function WallpaperDetailPage({ params }: WallpaperDetailPageProps
     }
   };
 
-  if (loading || !wallpaper) {
+  if (loading || (!wallpaper && !missing)) {
     return (
       <div className="mx-auto max-w-shell px-4 sm:px-6 py-8">
         <SkeletonGrid count={4} message="Loading wallpaper details..." />
+      </div>
+    );
+  }
+
+  if (missing || !wallpaper) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center space-y-4">
+        <h1 className="font-display text-2xl font-black text-strong">Wallpaper not found</h1>
+        <p className="text-sm text-muted">
+          This wallpaper doesn&apos;t exist or was removed.
+        </p>
+        <Link
+          href="/explore"
+          className="inline-block px-6 py-3 rounded-full bg-accent text-accent-ink text-xs font-bold hover:brightness-110 transition"
+        >
+          Explore wallpapers
+        </Link>
       </div>
     );
   }

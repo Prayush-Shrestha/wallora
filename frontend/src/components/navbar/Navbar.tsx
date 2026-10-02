@@ -61,8 +61,9 @@ export function Navbar() {
     const query = q.trim();
     if (query) {
       try {
-        const recent = JSON.parse(localStorage.getItem("wallora_recent_searches") || "[]");
-        const next = [query, ...recent.filter((r: string) => r !== query)].slice(0, 6);
+        const parsed: unknown = JSON.parse(localStorage.getItem("wallora_recent_searches") || "[]");
+        const recent = Array.isArray(parsed) ? parsed.filter((r): r is string => typeof r === "string") : [];
+        const next = [query, ...recent.filter((r) => r !== query)].slice(0, 6);
         localStorage.setItem("wallora_recent_searches", JSON.stringify(next));
       } catch {
         // Private mode — search still works, history just isn't saved.
@@ -102,7 +103,7 @@ export function Navbar() {
           {/* Desktop Nav Links — glass pill over photos, flat on solid bar */}
           <nav
             aria-label="Primary"
-            className={`hidden md:flex items-center gap-1 rounded-full px-1.5 py-1 transition-all duration-300 ${
+            className={`hidden md:flex items-center gap-0.5 rounded-full px-1.5 py-1 shrink-0 transition-all duration-300 ${
               onPhoto
                 ? "bg-black/35 backdrop-blur-md border border-white/15 shadow-[0_4px_24px_rgba(0,0,0,0.35)]"
                 : "bg-transparent border border-transparent"
@@ -115,7 +116,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  className={`px-2.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all ${
                     active
                       ? onPhoto
                         ? "bg-white text-black font-semibold shadow"
@@ -127,7 +128,7 @@ export function Navbar() {
                 >
                   {link.label}
                   {link.badge && (
-                    <span className="ml-1.5 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-accent text-accent-ink align-middle">
+                    <span className="ml-1.5 text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-accent text-accent-ink align-middle whitespace-nowrap">
                       {link.badge}
                     </span>
                   )}
@@ -138,7 +139,7 @@ export function Navbar() {
               <Link
                 href="/admin"
                 aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-2.5 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all ${
                   pathname.startsWith("/admin")
                     ? "text-accent-ink bg-accent font-semibold shadow"
                     : onPhoto
@@ -152,7 +153,7 @@ export function Navbar() {
           </nav>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearch} role="search" className="hidden lg:flex items-center relative w-64 xl:w-80">
+          <form onSubmit={handleSearch} role="search" className="hidden lg:flex items-center relative w-40 xl:w-80 min-w-0 flex-1 max-w-xs xl:max-w-none">
             <Search className={`absolute left-3.5 w-4 h-4 pointer-events-none ${onPhoto ? "text-neutral-300" : "text-faint"}`} aria-hidden />
             <label htmlFor="navbar-search" className="sr-only">
               Search wallpapers
@@ -174,7 +175,7 @@ export function Navbar() {
           </form>
 
           {/* Actions / Auth */}
-          <div className="hidden sm:flex items-center gap-1.5">
+          <div className="hidden sm:flex items-center gap-1.5 shrink-0">
             <Link
               href="/favorites"
               aria-label="View favorites"
@@ -201,16 +202,16 @@ export function Navbar() {
                 />
               </Link>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Link
                   href="/login"
-                  className={`text-xs font-semibold px-3 py-2 rounded-full transition ${onPhoto ? "text-neutral-300 hover:text-white hover:bg-white/10" : "text-muted hover:text-strong hover:bg-line/5"}`}
+                  className={`text-xs font-semibold px-3 py-2 rounded-full whitespace-nowrap transition ${onPhoto ? "text-neutral-300 hover:text-white hover:bg-white/10" : "text-muted hover:text-strong hover:bg-line/5"}`}
                 >
                   Log in
                 </Link>
                 <Link
                   href="/register"
-                  className="text-xs font-bold bg-accent text-accent-ink px-4 py-2 rounded-full hover:brightness-110 transition shadow-sm"
+                  className="text-xs font-bold bg-accent text-accent-ink px-4 py-2 rounded-full whitespace-nowrap hover:brightness-110 transition shadow-sm"
                 >
                   Sign up
                 </Link>

@@ -21,7 +21,8 @@ export function SearchPanel({ categories, variant = "hero" }: SearchPanelProps) 
 
   useEffect(() => {
     try {
-      setRecent(JSON.parse(localStorage.getItem("wallora_recent_searches") || "[]"));
+      const parsed: unknown = JSON.parse(localStorage.getItem("wallora_recent_searches") || "[]");
+      setRecent(Array.isArray(parsed) ? parsed.filter((r): r is string => typeof r === "string") : []);
     } catch {
       setRecent([]);
     }
