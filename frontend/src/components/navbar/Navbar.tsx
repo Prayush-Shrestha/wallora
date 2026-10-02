@@ -10,6 +10,8 @@ import { ThemeToggle } from "../ui/Theme";
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/explore", label: "Explore" },
+  { href: "/categories", label: "Categories" },
+  { href: "/collections", label: "Collections" },
   { href: "/ai-studio", label: "AI Studio", badge: "New" },
   { href: "/favorites", label: "Favorites" },
 ];

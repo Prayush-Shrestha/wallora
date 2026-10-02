@@ -34,3 +34,4 @@ export interface GenerateAIRequest {
   referenceType?: "NONE" | "USER_UPLOADED";
   userRightsConfirmed?: boolean;
 }
+

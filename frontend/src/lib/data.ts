@@ -6,14 +6,20 @@ function img(seed: string, w: number, h: number) {
 }
 
 export const CATEGORIES: Category[] = [
-  { id: "cat-1", name: "Nature & Landscapes", slug: "nature", description: "Mountains, oceans, misty forests, and cosmic skies.", image: img("wallora-nature", 600, 400), wallpaperCount: 4 },
-  { id: "cat-2", name: "Cars & Automotive", slug: "cars", description: "Hypercars, GT3 track weapons, retro classics, and rain slicks.", image: img("wallora-cars", 600, 400), wallpaperCount: 3 },
-  { id: "cat-3", name: "Anime & Manga", slug: "anime", description: "Cinematic sunsets, quiet city streets, and expressive character art.", image: img("wallora-anime", 600, 400), wallpaperCount: 3 },
-  { id: "cat-4", name: "Gaming & Cyberpunk", slug: "gaming", description: "Neon alleys, dark setup glows, pixel castles, and retro rigs.", image: img("wallora-gaming", 600, 400), wallpaperCount: 4 },
-  { id: "cat-5", name: "Minimal & Clean", slug: "minimal", description: "Soft gradients, calm dunes, linen textures, and breathing room.", image: img("wallora-minimal", 600, 400), wallpaperCount: 3 },
-  { id: "cat-6", name: "Space & Cosmos", slug: "space", description: "Orbital stations, dreamy galaxies, starfields, and distant planets.", image: img("wallora-space", 600, 400), wallpaperCount: 2 },
-  { id: "cat-7", name: "Aesthetic & Mood", slug: "aesthetic", description: "Pink dunes, soft grain, dreamy lighting, and editorial tone.", image: img("wallora-aesthetic", 600, 400), wallpaperCount: 2 },
-  { id: "cat-8", name: "Technology & Code", slug: "technology", description: "Macro circuits, dark terminals, futuristic cities, and synth.", image: img("wallora-tech", 600, 400), wallpaperCount: 3 },
+  { id: "cat-1", name: "Nature", slug: "nature", description: "Mountains, oceans, misty forests, and cosmic skies.", image: img("wallora-nature", 600, 400), wallpaperCount: 4 },
+  { id: "cat-2", name: "Cars", slug: "cars", description: "Hypercars, GT3 track weapons, retro classics, and rain slicks.", image: img("wallora-cars", 600, 400), wallpaperCount: 3 },
+  { id: "cat-3", name: "Anime", slug: "anime", description: "Cinematic sunsets, quiet city streets, and expressive character art.", image: img("wallora-anime", 600, 400), wallpaperCount: 3 },
+  { id: "cat-4", name: "Gaming", slug: "gaming", description: "Neon alleys, dark setup glows, pixel castles, and retro rigs.", image: img("wallora-gaming", 600, 400), wallpaperCount: 4 },
+  { id: "cat-5", name: "Minimal", slug: "minimal", description: "Soft gradients, calm dunes, linen textures, and breathing room.", image: img("wallora-minimal", 600, 400), wallpaperCount: 3 },
+  { id: "cat-6", name: "Space", slug: "space", description: "Orbital stations, dreamy galaxies, starfields, and distant planets.", image: img("wallora-space", 600, 400), wallpaperCount: 2 },
+  { id: "cat-7", name: "Aesthetic", slug: "aesthetic", description: "Pink dunes, soft grain, dreamy lighting, and editorial tone.", image: img("wallora-aesthetic", 600, 400), wallpaperCount: 2 },
+  { id: "cat-8", name: "Technology", slug: "technology", description: "Macro circuits, dark terminals, futuristic cities, and synth.", image: img("wallora-tech", 600, 400), wallpaperCount: 3 },
+  { id: "cat-9", name: "Men", slug: "men", description: "Dark portraits, street style, and bold masculine moods.", image: img("wallora-men", 600, 400), wallpaperCount: 0 },
+  { id: "cat-10", name: "Women", slug: "women", description: "Fashion editorial, soft light portraits, and elegant moods.", image: img("wallora-women", 600, 400), wallpaperCount: 0 },
+  { id: "cat-11", name: "Kids", slug: "kids", description: "Playful colors, cute animals, and cheerful illustrations.", image: img("wallora-kids", 600, 400), wallpaperCount: 0 },
+  { id: "cat-12", name: "Travel", slug: "travel", description: "City streets, hidden beaches, and wanderlust moments.", image: img("wallora-travel", 600, 400), wallpaperCount: 0 },
+  { id: "cat-13", name: "Animals", slug: "animals", description: "Wildlife, pets, and macro nature portraits.", image: img("wallora-animals", 600, 400), wallpaperCount: 0 },
+  { id: "cat-14", name: "Architecture", slug: "architecture", description: "Skylines, interiors, and geometric structures.", image: img("wallora-architecture", 600, 400), wallpaperCount: 0 },
 ];
 
 export const MOCK_WALLPAPERS: Wallpaper[] = [

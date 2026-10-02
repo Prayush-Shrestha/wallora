@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Wallpaper, WallpaperFilterParams } from "../../types/wallpaper";
 import { WallpaperGrid } from "../../components/wallpaper/WallpaperGrid";
-import { WallpaperFilter } from "../../components/wallpaper/WallpaperFilter";
+import { WallpaperFilters } from "../../components/wallpaper/WallpaperFilters";
 import { FadeIn } from "../../components/ui/FadeIn";
 import { SkeletonGrid } from "../../components/ui/Skeleton";
 import * as wallpaperService from "../../services/wallpaperService";
@@ -120,7 +120,7 @@ function ExploreContent() {
         </div>
       </FadeIn>
 
-      <WallpaperFilter filters={filters} onChange={handleFilterChange} categories={CATEGORIES} />
+      <WallpaperFilters filters={filters} onChange={handleFilterChange} categories={CATEGORIES} />
 
       {!loading && (
         <p className="text-xs text-faint" role="status">

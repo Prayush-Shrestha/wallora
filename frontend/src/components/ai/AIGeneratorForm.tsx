@@ -2,18 +2,17 @@
 
 import { useState } from "react";
 import {
-  Sparkles,
   Wand2,
   Loader2,
-  Smartphone,
-  Monitor,
-  Square,
-  Tablet,
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 import { GenerateAIRequest } from "../../types/ai";
+import { AIPromptBox } from "./AIPromptBox";
+import { AIPromptSuggestions } from "./AIPromptSuggestions";
+import { AIStyleSelector } from "./AIStyleSelector";
+import { AIResolutionSelector, AIOrientation, AIResolution } from "./AIResolutionSelector";
 
 interface AIGeneratorFormProps {
   onGenerate: (data: GenerateAIRequest) => Promise<void>;
@@ -54,12 +53,13 @@ const SAMPLE_PROMPTS = [
   "Anime girl in a straw hat standing in a golden sunflower field under vast summer cumulus clouds, Studio Ghibli inspired.",
 ];
 
+// AI Studio form — composes small focused components so page.tsx stays thin.
 export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIGeneratorFormProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [category, setCategory] = useState("none");
   const [style, setStyle] = useState("none");
-  const [orientation, setOrientation] = useState<"landscape" | "portrait" | "square" | "ultrawide" | "tablet">("landscape");
-  const [resolution, setResolution] = useState<"standard" | "4k">("4k");
+  const [orientation, setOrientation] = useState<AIOrientation>("landscape");
+  const [resolution, setResolution] = useState<AIResolution>("4k");
   const [negativePrompt, setNegativePrompt] = useState("");
   const [provider, setProvider] = useState<"auto" | "flux-free" | "replicate" | "openai">("auto");
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -78,56 +78,13 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
     });
   };
 
-  const applySample = (sample: string) => {
-    setPrompt(sample);
-  };
-
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-line/10 bg-raised/80 backdrop-blur-xl p-6 sm:p-8 space-y-6">
-    
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label htmlFor="ai-prompt" className="text-xs font-semibold text-muted uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-accent" aria-hidden />
-            <span>Describe your wallpaper</span>
-          </label>
-          {prompt && (
-            <button
-              type="button"
-              onClick={() => setPrompt("")}
-              className="text-xs text-faint hover:text-strong transition"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        <textarea
-          id="ai-prompt"
-          rows={3}
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="e.g. A realistic mountain landscape at sunrise with a small wooden cabin beside a lake, soft natural lighting, mist in distance, no text or logos..."
-          className="w-full rounded-xl bg-base border border-line/10 p-4 text-sm text-strong placeholder:text-faint focus:outline-none focus:border-accent transition-colors resize-none leading-relaxed"
-        />
-
-        {/* Sample Prompts */}
-        <div className="mt-2.5 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] text-faint shrink-0">Try:</span>
-          {SAMPLE_PROMPTS.map((sample, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => applySample(sample)}
-              className="text-[11px] px-2.5 py-1 rounded-full bg-line/5 hover:bg-line/10 text-muted hover:text-strong border border-line/5 whitespace-nowrap transition"
-            >
-              {sample.slice(0, 32)}...
-            </button>
-          ))}
-        </div>
+        <AIPromptBox prompt={prompt} onChange={setPrompt} />
+        <AIPromptSuggestions suggestions={SAMPLE_PROMPTS} onSelect={setPrompt} />
       </div>
 
-      {/* Theme Category Chips */}
       <div>
         <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
           Category / Theme
@@ -151,140 +108,16 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
         </div>
       </div>
 
-      {/* Visual Style Chips */}
-      <div>
-        <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">
-          Visual Style
-        </label>
-        <div className="flex flex-wrap gap-1.5">
-          {STYLES.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setStyle(s.id)}
-              aria-pressed={style === s.id}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
-                style === s.id
-                  ? "bg-white text-black font-bold shadow-sm"
-                  : "bg-line/5 text-muted border border-line/10 hover:bg-line/10 hover:text-strong"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AIStyleSelector styles={STYLES} selected={style} onSelect={setStyle} />
 
-      {/* Device & Aspect Ratio */}
-      <div className="space-y-2">
-        <label className="block text-xs font-semibold text-muted uppercase tracking-wider">
-          Target Device & Aspect Ratio
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-          <button
-            type="button"
-            onClick={() => setOrientation("landscape")}
-            aria-pressed={orientation === "landscape"}
-            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-medium transition ${
-              orientation === "landscape"
-                ? "border-accent bg-accent/10 text-accent font-semibold"
-                : "border-line/10 bg-line/5 text-muted hover:text-strong"
-            }`}
-          >
-            <Monitor className="w-4 h-4 mb-1" aria-hidden />
-            <span>Desktop</span>
-            <span className="text-[10px] text-faint">16:9</span>
-          </button>
+      <AIResolutionSelector
+        orientation={orientation}
+        onOrientationChange={setOrientation}
+        resolution={resolution}
+        onResolutionChange={setResolution}
+      />
 
-          <button
-            type="button"
-            onClick={() => setOrientation("portrait")}
-            aria-pressed={orientation === "portrait"}
-            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-medium transition ${
-              orientation === "portrait"
-                ? "border-accent bg-accent/10 text-accent font-semibold"
-                : "border-line/10 bg-line/5 text-muted hover:text-strong"
-            }`}
-          >
-            <Smartphone className="w-4 h-4 mb-1" aria-hidden />
-            <span>Mobile</span>
-            <span className="text-[10px] text-faint">9:16</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setOrientation("tablet")}
-            aria-pressed={orientation === "tablet"}
-            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-medium transition ${
-              orientation === "tablet"
-                ? "border-accent bg-accent/10 text-accent font-semibold"
-                : "border-line/10 bg-line/5 text-muted hover:text-strong"
-            }`}
-          >
-            <Tablet className="w-4 h-4 mb-1" aria-hidden />
-            <span>Tablet</span>
-            <span className="text-[10px] text-faint">3:4</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setOrientation("ultrawide")}
-            aria-pressed={orientation === "ultrawide"}
-            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-medium transition ${
-              orientation === "ultrawide"
-                ? "border-accent bg-accent/10 text-accent font-semibold"
-                : "border-line/10 bg-line/5 text-muted hover:text-strong"
-            }`}
-          >
-            <Monitor className="w-4 h-4 mb-1" aria-hidden />
-            <span>Ultrawide</span>
-            <span className="text-[10px] text-faint">21:9</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setOrientation("square")}
-            aria-pressed={orientation === "square"}
-            className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-medium transition col-span-2 sm:col-span-1 ${
-              orientation === "square"
-                ? "border-accent bg-accent/10 text-accent font-semibold"
-                : "border-line/10 bg-line/5 text-muted hover:text-strong"
-            }`}
-          >
-            <Square className="w-4 h-4 mb-1" aria-hidden />
-            <span>Square</span>
-            <span className="text-[10px] text-faint">1:1</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Resolution & Advanced Settings Toggle */}
-      <div className="flex items-center justify-between pt-2">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setResolution("standard")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
-              resolution === "standard"
-                ? "bg-line/20 border-line/30 text-strong"
-                : "border-line/10 text-faint hover:text-muted"
-            }`}
-          >
-            FHD (1080p)
-          </button>
-          <button
-            type="button"
-            onClick={() => setResolution("4k")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${
-              resolution === "4k"
-                ? "bg-accent/10 border-accent/30 text-accent font-bold"
-                : "border-line/10 text-faint hover:text-muted"
-            }`}
-          >
-            Ultra HD (4K)
-          </button>
-        </div>
-
+      <div className="flex items-center justify-end pt-2">
         <button
           type="button"
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -296,7 +129,6 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
         </button>
       </div>
 
-      {/* Advanced Settings: Negative Prompt & Provider */}
       {showAdvanced && (
         <div className="p-4 rounded-xl border border-line/10 bg-base/50 space-y-4">
           <div>
@@ -323,7 +155,7 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
             <select
               id="ai-provider"
               value={provider}
-              onChange={(e) => setProvider(e.target.value as any)}
+              onChange={(e) => setProvider(e.target.value as typeof provider)}
               className="w-full rounded-lg bg-base border border-line/10 px-3.5 py-2 text-xs text-strong focus:outline-none focus:border-accent"
             >
               <option value="auto">Auto (Best Available Engine)</option>
@@ -335,7 +167,6 @@ export function AIGeneratorForm({ onGenerate, loading, initialPrompt = "" }: AIG
         </div>
       )}
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={loading || !prompt.trim()}

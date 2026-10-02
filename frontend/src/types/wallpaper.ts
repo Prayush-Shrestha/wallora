@@ -49,3 +49,4 @@ export interface WallpaperFilterParams {
   page?: number;
   limit?: number;
 }
+

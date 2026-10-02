@@ -1,20 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles, Download } from "lucide-react";
-import { WallpaperGrid } from "../components/wallpaper/WallpaperGrid";
-import { WallpaperCard } from "../components/wallpaper/WallpaperCard";
-import { CategoryCard } from "../components/categories/CategoryCard";
-import { FadeIn } from "../components/ui/FadeIn";
-import { SectionHeading } from "../components/ui/SectionHeading";
-import { SearchPanel } from "../components/search/SearchPanel";
-import { MOCK_WALLPAPERS, CATEGORIES } from "../lib/data";
+import { Hero } from "../components/home/Hero";
+import { FeaturedWallpaper } from "../components/home/FeaturedWallpaper";
+import { TrendingWallpapers } from "../components/home/TrendingWallpapers";
+import { PopularCategories } from "../components/home/PopularCategories";
+import { FreshWallpapers } from "../components/home/FreshWallpapers";
+import { CATEGORIES, MOCK_WALLPAPERS } from "../lib/data";
 import { formatNumber } from "../utils/format";
 import * as wallpaperService from "../services/wallpaperService";
 
 export const revalidate = 60;
 
-const TRENDING_LINKS = ["Anime", "Cars", "Minimal", "Nature", "Aesthetic"];
-
+// Home page — thin assembly of focused home components.
+// Each section lives in components/home/ so this file stays readable.
 export default async function HomePage() {
   let wallpapers = MOCK_WALLPAPERS;
 
@@ -39,113 +38,14 @@ export default async function HomePage() {
 
   return (
     <div className="pb-16">
-      {/* ── Hero (spec D): wallpaper centerpiece + search ── */}
-      <section className="relative -mt-16 pt-32 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6">
-        {hero && (
-          <div className="absolute inset-0 overflow-hidden" aria-hidden>
-            <Image
-              src={hero.imageUrl}
-              alt=""
-              aria-hidden
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/55" />
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/75 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-950 to-transparent" />
-          </div>
-        )}
-        <FadeIn className="relative z-10 max-w-3xl mx-auto text-center">
-          <p className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 border border-line/15 text-[11px] font-semibold text-neutral-200 mb-6 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 text-accent" aria-hidden />
-            <span>{wallpapers.length * 1247}+ hand-picked 4K wallpapers</span>
-          </p>
+      <Hero hero={hero} totalCount={wallpapers.length} categories={CATEGORIES} />
 
-          <h1 className="font-display text-4xl sm:text-6xl font-black tracking-tight leading-[1.05] text-white text-balance">
-            Find a wallpaper that feels like you.
-          </h1>
+      <FeaturedWallpaper large={featuredLarge} small={featuredSmall} />
 
-          <div className="mt-8">
-            <SearchPanel categories={CATEGORIES} />
-          </div>
+      <TrendingWallpapers wallpapers={trending} />
 
-          <p className="mt-5 text-xs text-neutral-300">
-            <span className="text-muted">Trending:</span>{" "}
-            {TRENDING_LINKS.map((t, i) => (
-              <span key={t}>
-                <Link
-                  href={`/explore?q=${encodeURIComponent(t.toLowerCase())}`}
-                  className="font-medium text-neutral-200 hover:text-accent transition underline-offset-4 hover:underline"
-                >
-                  {t}
-                </Link>
-                {i < TRENDING_LINKS.length - 1 && <span className="text-faint"> · </span>}
-              </span>
-            ))}
-          </p>
-        </FadeIn>
-      </section>
+      <PopularCategories categories={CATEGORIES} />
 
-      {/* ── Featured editorial (spec B: intentional asymmetry) ── */}
-      {featuredLarge && (
-        <section className="mx-auto max-w-shell px-4 sm:px-6 mt-4 sm:mt-8" aria-label="Featured wallpapers">
-          <SectionHeading
-            eyebrow="Curated"
-            title="Featured this week"
-            actionHref="/explore?sort=trending"
-            actionLabel="View all"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 sm:gap-6">
-            <div className="md:col-span-3">
-              <WallpaperCard wallpaper={featuredLarge} naturalAspect />
-            </div>
-            <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-1 gap-4 sm:gap-6">
-              {featuredSmall.map((w) => (
-                <WallpaperCard key={w.id} wallpaper={w} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Trending masonry (spec E) ── */}
-      {trending.length > 0 && (
-        <section className="mx-auto max-w-shell px-4 sm:px-6 mt-16 sm:mt-24" aria-label="Trending wallpapers">
-          <SectionHeading
-            eyebrow="Masonry mix"
-            title="Trending across the community"
-            description="Different shapes, one flow — wallpapers keep their natural aspect."
-            actionHref="/explore?sort=trending"
-            actionLabel="Explore more"
-          />
-          <WallpaperGrid wallpapers={trending} layout="masonry" />
-        </section>
-      )}
-
-      {/* ── Vibes: horizontal scroll on mobile (spec P) ── */}
-      <section className="mt-16 sm:mt-24" aria-label="Browse by vibe">
-        <div className="mx-auto max-w-shell px-4 sm:px-6">
-          <SectionHeading
-            eyebrow="Vibes"
-            title="Pick a lane"
-            actionHref="/explore"
-            actionLabel="All categories"
-          />
-        </div>
-        <div className="mx-auto max-w-shell pl-4 sm:px-6">
-          <div className="flex gap-4 overflow-x-auto pb-2 pr-4 scrollbar-none snap-x lg:grid lg:grid-cols-4 lg:overflow-visible lg:pr-0">
-            {CATEGORIES.slice(0, 8).map((cat) => (
-              <div key={cat.id} className="min-w-[240px] snap-start lg:min-w-0">
-                <CategoryCard category={cat} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Wallpaper of the Day (large editorial, spec C) ── */}
       {ofTheDay && (
         <section className="mx-auto max-w-shell px-4 sm:px-6 mt-16 sm:mt-24" aria-label="Wallpaper of the day">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center border-y border-line/10 py-12 sm:py-16">
@@ -171,9 +71,7 @@ export default async function HomePage() {
                 {ofTheDay.title}
               </h2>
               {ofTheDay.description && (
-                <p className="mt-3 text-sm text-muted leading-relaxed">
-                  {ofTheDay.description}
-                </p>
+                <p className="mt-3 text-sm text-muted leading-relaxed">{ofTheDay.description}</p>
               )}
               <p className="mt-4 flex items-center gap-4 text-xs text-muted">
                 <span className="inline-flex items-center gap-1.5">
@@ -199,7 +97,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── AI Studio band (restrained, spec B) ── */}
       <section className="mx-auto max-w-shell px-4 sm:px-6 mt-16 sm:mt-24" aria-label="AI Studio">
         <div className="rounded-3xl overflow-hidden border border-line/10 bg-raised p-8 sm:p-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
           <div className="max-w-xl">
@@ -223,18 +120,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Latest ── */}
-      {latest.length > 0 && (
-        <section className="mx-auto max-w-shell px-4 sm:px-6 mt-16 sm:mt-24" aria-label="Latest wallpapers">
-          <SectionHeading
-            eyebrow="Fresh"
-            title="Latest drops"
-            actionHref="/explore?sort=recent"
-            actionLabel="See newest"
-          />
-          <WallpaperGrid wallpapers={latest} />
-        </section>
-      )}
+      <FreshWallpapers wallpapers={latest} />
     </div>
   );
 }

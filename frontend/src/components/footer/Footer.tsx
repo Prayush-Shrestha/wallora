@@ -16,7 +16,10 @@ export function Footer() {
 
           <div className="flex flex-wrap items-center gap-6 text-xs text-muted">
             <Link href="/explore" className="hover:text-strong transition">Explore</Link>
+            <Link href="/categories" className="hover:text-strong transition">Categories</Link>
+            <Link href="/collections" className="hover:text-strong transition">Collections</Link>
             <Link href="/ai-studio" className="hover:text-strong transition">AI Studio</Link>
+            <Link href="/upload" className="hover:text-strong transition">Upload</Link>
             <Link href="/favorites" className="hover:text-strong transition">Favorites</Link>
             <Link href="/login" className="hover:text-strong transition">Account</Link>
           </div>
