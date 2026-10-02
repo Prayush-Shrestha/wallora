@@ -22,9 +22,24 @@ export function errorHandler(
     return;
   }
 
+  // Multer upload errors (e.g. file too large) are client errors, not 500s.
+  if (err?.code === "LIMIT_FILE_SIZE") {
+    res.status(413).json({ success: false, error: "File is too large. Maximum size is 20 MB." });
+    return;
+  }
+
+  // 4xx responses are expected client outcomes, not server fires.
+  const status: number = Number(err.status || err.statusCode || 500);
+  const message: string = err.message || "Internal server error. Please try again later.";
+  if (status < 500) {
+    res.status(status).json({
+      success: false,
+      error: message,
+    });
+    return;
+  }
+
   console.error("🔥 Server Error:", err);
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal server error. Please try again later.";
 
   res.status(status).json({
     success: false,

@@ -10,6 +10,7 @@ export function isDbOfflineError(err: any): boolean {
     code === "P1002" || // Database timed out
     code === "P1017" || // Connection closed
     msg.includes("Can't reach database server") ||
+    msg.includes("Database connection timeout") || // service-level 1.5s query race
     msg.includes("Connection refused") ||
     msg.includes("connect ECONNREFUSED")
   );

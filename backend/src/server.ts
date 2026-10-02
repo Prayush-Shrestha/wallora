@@ -17,19 +17,22 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
-// CORS configuration for frontend (extra local ports so the dev
-// server keeps working even if 3000 is busy and Next bumps ports)
+// CORS configuration for frontend. Localhost origins are a dev convenience —
+// in production only the configured CLIENT_URL is trusted.
+const LOCAL_ORIGINS =
+  process.env.NODE_ENV === "production"
+    ? []
+    : [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://127.0.0.1:3002",
+      ];
 app.use(
   cors({
-    origin: [
-      CLIENT_URL,
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-      "http://127.0.0.1:3002",
-    ],
+    origin: [CLIENT_URL, ...LOCAL_ORIGINS],
     credentials: true,
   })
 );

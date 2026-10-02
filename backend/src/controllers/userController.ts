@@ -23,6 +23,12 @@ export async function getProfile(req: AuthRequest, res: Response, next: NextFunc
       },
     });
 
+    if (!user) {
+      const error: any = new Error("User not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
     res.json({
       success: true,
       data: { user },

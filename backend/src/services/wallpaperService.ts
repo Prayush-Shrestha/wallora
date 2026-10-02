@@ -1,5 +1,6 @@
 import prisma from "../config/database";
 import { WallpaperFilterOptions } from "../types";
+import { isDbOfflineError } from "../utils/db";
 
 export const SAMPLE_WALLPAPERS = [
   {
@@ -184,7 +185,10 @@ export async function getWallpapers(filters: WallpaperFilterOptions) {
         totalPages: Math.ceil(total / limit),
       },
     };
-  } catch {
+  } catch (err: any) {
+    // Only the offline case falls back to samples. Real errors (bad query,
+    // misconfig) must surface so they can be fixed instead of hiding as 200s.
+    if (err?.statusCode || !isDbOfflineError(err)) throw err;
     console.warn("[Wallpaper Service] Database offline. Returning sample wallpapers with provenance badges.");
     const filtered = SAMPLE_WALLPAPERS.filter((w) => {
       if (category && category !== "all" && w.category.slug !== category.toLowerCase()) return false;
@@ -245,7 +249,7 @@ export async function getWallpaperById(id: string) {
 
     const similar = await prisma.wallpaper.findMany({
       where: {
-        categoryId: wallpaper.categoryId,
+        ...(wallpaper.categoryId ? { categoryId: wallpaper.categoryId } : {}),
         id: { not: wallpaper.id },
       },
       take: 8,
@@ -256,8 +260,17 @@ export async function getWallpaperById(id: string) {
     });
 
     return { wallpaper, similar };
-  } catch {
-    const fallback = SAMPLE_WALLPAPERS.find((w) => w.id === id) || SAMPLE_WALLPAPERS[0];
+  } catch (err: any) {
+    // A 404 for a bogus id must stay a 404 — only offline mode serves samples.
+    if (err?.statusCode || !isDbOfflineError(err)) throw err;
+    // Offline we can only vouch for ids we actually bundle: serving
+    // SAMPLE_WALLPAPERS[0] for an unknown id shows the WRONG wallpaper.
+    const fallback = SAMPLE_WALLPAPERS.find((w) => w.id === id);
+    if (!fallback) {
+      const notFound: any = new Error("Wallpaper not found.");
+      notFound.statusCode = 404;
+      throw notFound;
+    }
     return {
       wallpaper: fallback,
       similar: SAMPLE_WALLPAPERS.filter((w) => w.id !== fallback.id).slice(0, 4),
@@ -319,21 +332,24 @@ export async function createWallpaper(data: {
 
 export async function recordDownload(wallpaperId: string, userId?: string) {
   try {
-    const [wallpaper] = await Promise.all([
-      prisma.wallpaper.update({
-        where: { id: wallpaperId },
-        data: { downloads: { increment: 1 } },
-      }),
-      prisma.download.create({
-        data: {
-          wallpaperId,
-          userId: userId || null,
-        },
-      }),
-    ]);
+    const wallpaper = await prisma.wallpaper.update({
+      where: { id: wallpaperId },
+      data: { downloads: { increment: 1 } },
+    });
+    // History row is best-effort: a failed insert must not fail the download.
+    prisma.download
+      .create({ data: { wallpaperId, userId: userId || null } })
+      .catch(() => {});
     return { downloads: wallpaper.downloads };
-  } catch {
-    return { downloads: 1 };
+  } catch (err: any) {
+    if (err?.code === "P2025") {
+      const notFound: any = new Error("Wallpaper not found.");
+      notFound.statusCode = 404;
+      throw notFound;
+    }
+    // Offline: the client already increments its own counter optimistically.
+    if (isDbOfflineError(err)) return { downloads: 0, offline: true };
+    throw err;
   }
 }
 

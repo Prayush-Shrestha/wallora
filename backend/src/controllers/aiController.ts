@@ -28,11 +28,8 @@ export async function generateAIWallpaper(req: AuthRequest, res: Response, next:
       data: { wallpaper },
     });
   } catch (err: any) {
-    console.error("[AI Controller Error]:", err?.message || err);
-    res.status(500).json({
-      success: false,
-      error: err?.message || "Failed to generate AI wallpaper. Please try again.",
-    });
+    // Central errorHandler formats the response (incl. friendly offline 503s).
+    next(err);
   }
 }
 

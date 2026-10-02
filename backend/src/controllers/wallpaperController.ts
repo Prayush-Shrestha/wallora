@@ -7,6 +7,17 @@ export async function getWallpapers(req: Request, res: Response, next: NextFunct
   try {
     const { category, orientation, deviceType, isAI, q, sort, page, limit } = req.query;
 
+    const pageNum = page ? parseInt(page as string, 10) : 1;
+    const limitNum = limit ? parseInt(limit as string, 10) : 24;
+    if (!Number.isInteger(pageNum) || pageNum < 1) {
+      res.status(400).json({ success: false, error: "Query 'page' must be a positive integer." });
+      return;
+    }
+    if (!Number.isInteger(limitNum) || limitNum < 1 || limitNum > 100) {
+      res.status(400).json({ success: false, error: "Query 'limit' must be an integer between 1 and 100." });
+      return;
+    }
+
     const result = await wallpaperService.getWallpapers({
       category: category as string,
       orientation: orientation as string,
@@ -14,8 +25,8 @@ export async function getWallpapers(req: Request, res: Response, next: NextFunct
       isAI: isAI !== undefined ? isAI === "true" || isAI === "1" : undefined,
       q: q as string,
       sort: sort as any,
-      page: page ? parseInt(page as string, 10) : 1,
-      limit: limit ? parseInt(limit as string, 10) : 24,
+      page: pageNum,
+      limit: limitNum,
     });
 
     res.json({

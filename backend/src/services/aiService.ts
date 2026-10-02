@@ -1,4 +1,5 @@
 import prisma from "../config/database";
+import { isDbOfflineError } from "../utils/db";
 import { processPrompt, PromptProcessingInput } from "../utils/promptEngine";
 
 export interface GenerateAIWallpaperInput extends PromptProcessingInput {
@@ -251,10 +252,17 @@ export async function generateAIWallpaper(
           data: {
             userId: input.userId || null,
             prompt: processed.originalPrompt,
+            enhancedPrompt: processed.enhancedPrompt,
+            negativePrompt: processed.negativePrompt,
             style: input.style || "Natural",
+            category: input.category,
             orientation: input.orientation || "landscape",
             resolution: input.resolution || "4k",
+            aspectRatio: processed.aspectRatio,
+            dimensionsWidth: processed.dimensions?.width,
+            dimensionsHeight: processed.dimensions?.height,
             imageUrl,
+            provider: activeProvider,
           },
         }),
         new Promise<never>((_, reject) =>
@@ -292,7 +300,10 @@ export async function getUserAIWallpapers(userId: string) {
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
-  } catch {
-    return [];
+  } catch (err: any) {
+    // Empty history is only honest when the DB is unreachable.
+    // Real errors must surface instead of masquerading as "no creations".
+    if (isDbOfflineError(err)) return [];
+    throw err;
   }
 }
