@@ -1,6 +1,14 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 build/
 *.tsbuildinfo
+
+# Environment files
+# Ignore real secrets; keep committed templates.
 .env
-.env*.local
+.env.*
+!.env.example
+!.env.*.example
